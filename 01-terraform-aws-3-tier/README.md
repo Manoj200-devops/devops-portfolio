@@ -412,7 +412,7 @@ The final environment provides:
 * Security Group-based traffic control
 * Infrastructure fully managed through Terraform
 
-## Interview Explanation
+
 
 ### Project Summary
 
