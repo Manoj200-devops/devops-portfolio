@@ -1,0 +1,41 @@
+
+pipeline {
+
+    agent {
+        label 'docker-agent'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                    cd 02-jenkins-docker-sonarqube-cicd/application
+                    ./test.sh
+                '''
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+
+                    def scannerHome = tool 'SonarScanner'
+
+                    sh """
+                        cd 02-jenkins-docker-sonarqube-cicd/application
+                        ${scannerHome}/bin/sonar-scanner
+                    """
+                }
+            }
+        }
+
+    }
+}
+
