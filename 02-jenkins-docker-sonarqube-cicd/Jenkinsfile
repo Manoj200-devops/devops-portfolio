@@ -37,5 +37,14 @@ pipeline {
             }
         }
 
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    cd 02-jenkins-docker-sonarqube-cicd/application
+                    docker build -t devops-cicd-demo:latest .
+                '''
+            }
+        }
     }
 }
+
