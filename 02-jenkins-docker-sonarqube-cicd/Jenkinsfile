@@ -55,7 +55,9 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                        echo "$DOCKER_PASSWORD" | docker login \
+                            -u "$DOCKER_USERNAME" \
+                            --password-stdin
 
                         docker tag devops-cicd-demo:latest \
                             $DOCKER_USERNAME/devops-cicd-demo:latest
@@ -64,6 +66,25 @@ pipeline {
                             $DOCKER_USERNAME/devops-cicd-demo:latest
 
                         docker logout
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sshagent(['jenkins-deployment-ssh']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no \
+                            ubuntu@172.31.14.79 "
+                                docker pull mgmanoj2000/devops-cicd-demo:latest &&
+                                docker stop devops-cicd-demo || true &&
+                                docker rm devops-cicd-demo || true &&
+                                docker run -d \
+                                    --name devops-cicd-demo \
+                                    -p 80:8080 \
+                                    mgmanoj2000/devops-cicd-demo:latest
+                            "
                     '''
                 }
             }
